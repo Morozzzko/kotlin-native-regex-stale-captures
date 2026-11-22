@@ -1,10 +1,19 @@
-# Kotlin/Native regex keeps stale capture groups (2.3.20+)
+# Kotlin/Native Regex stale capture regression
 
-Since Kotlin 2.3.20, Kotlin/Native's `Regex` can report a group as matched with a value from an abandoned backtracking attempt. Kotlin/JVM and Native 2.3.10 behave correctly.
+Kotlin/Native `Regex` can return a capture from an abandoned backtracking attempt.
 
-```sh
-./gradlew jvmTest macosArm64Test                        # Kotlin 2.4.21: JVM passes, macOS fails 4/4
-./gradlew macosArm64Test -PkotlinVersion=2.3.10         # last good version: passes
+**TL;DR:** The last good Kotlin/Native version is 2.3.10; 2.3.20 through 2.4.21 are broken. Kotlin/JVM passes.
+
+```kotlin
+Regex("(a)?a").matchEntire("a")!!.groups[1]
 ```
 
-Details, versions tested and the likely cause: [REPORT.md](REPORT.md).
+Expected: `null`
+Actual: `MatchGroup(value=a, range=0..0)`
+
+```sh
+./gradlew jvmTest macosArm64Test                    # 2.4.21: JVM passes, Native fails
+./gradlew macosArm64Test -PkotlinVersion=2.3.10     # Native passes
+```
+
+Details: [REPORT.md](REPORT.md)
