@@ -1,6 +1,6 @@
-# Kotlin/Native Regex retains stale captures (2.3.20 regression)
+# Kotlin/Native and Wasm Regex retain stale captures (2.3.20 regression)
 
-Since 2.3.20, Kotlin/Native `Regex` can report a group as matched with a value from an abandoned backtracking attempt; Kotlin/JVM and Kotlin/Native 2.3.10 report it as unmatched.
+Since 2.3.20, Kotlin/Native and Kotlin/Wasm `Regex` can report a group as matched with a value from an abandoned backtracking attempt; Kotlin/JVM, Kotlin/JS and 2.3.10 report it as unmatched.
 
 ## Reproduction
 
@@ -12,14 +12,14 @@ Regex("(a)??b|a").matchEntire("a")!!.groups[1]    // reluctant group fails
 ```
 
 Expected `groups[1]`: `null`.
-Actual on Kotlin/Native 2.3.20+: `MatchGroup(value=a, range=0..0)`.
+Actual on Kotlin/Native and Kotlin/Wasm 2.3.20+: `MatchGroup(value=a, range=0..0)`.
 
-| Kotlin | `jvmTest` | `macosArm64Test` |
-|---|---|---|
-| 2.3.10 | – | 4/4 pass |
-| 2.3.20, 2.3.21 | – | 4/4 fail |
-| 2.4.0, 2.4.20 | – | 4/4 fail |
-| 2.4.21 | 4/4 pass | 4/4 fail |
+| Kotlin | `jvmTest` | `jsNodeTest` | `macosArm64Test` | `wasmJsNodeTest` |
+|---|---|---|---|---|
+| 2.3.10 | – | – | 4/4 pass | 4/4 pass |
+| 2.3.20, 2.3.21 | – | – | 4/4 fail | – |
+| 2.4.0, 2.4.20 | – | – | 4/4 fail | – |
+| 2.4.21 | 4/4 pass | 4/4 pass | 4/4 fail | 4/4 fail |
 
 Environment: macOS 27.2 (arm64), Xcode 27.2, Gradle 8.14.3, JDK 21 (Gradle daemon). The same behavior shows up on `iosSimulatorArm64` in a production app.
 
