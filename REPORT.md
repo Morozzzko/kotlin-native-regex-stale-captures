@@ -33,7 +33,7 @@ This is not the "retain the previously captured value" behavior for repeated gro
 
 ## Likely cause
 
-f213a9f11e "KT-78089 match quantified groups without recursion, when possible" (in 2.3.20-Beta2) added `TrivialGroupQuantifierSet` and `ReluctantTrivialGroupQuantifierSet`.
+[f213a9f11e](https://github.com/JetBrains/kotlin/commit/f213a9f11e071565b8ccc729837e6494912360c9) "KT-78089 match quantified groups without recursion, when possible" added `TrivialGroupQuantifierSet` and `ReluctantTrivialGroupQuantifierSet`. It is in `v2.3.20` and not in `v2.3.10`, and neither class has changed on `master` since, apart from a refactoring commit.
 
 - `TrivialGroupQuantifierSet` saves the group's boundaries after `innerSet.matches(...)` succeeds, so rolling an occurrence back "restores" the occurrence being dropped (`(a)?a`).
 - When the quantifier as a whole fails, before reaching the minimum (`(a){2}|a`) or because `next.matches(...)` fails (`(a)+b|a`), it returns `-1` without restoring the boundaries the group had on entry.
@@ -43,5 +43,6 @@ Suggested fix: save the group's boundaries before each occurrence, and restore t
 
 ## Related
 
-- KT-89187: Regex fails to backtrack across unequal-length alternatives (same engine area; different symptom).
+- KT-78089: the change that introduced this.
 - KT-58198: Native Regex issues (umbrella).
+- KT-89187: Regex fails to backtrack across unequal-length alternatives. Same engine, but a separate bug: it also fails on 2.3.10.
